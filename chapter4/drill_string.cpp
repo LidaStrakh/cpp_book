@@ -1,50 +1,50 @@
 #include "std_lib_facilities.h"
+#include <assert.h>
 
 int str_to_num(string str, bool* pok) {
-  int x = 0;
-  int y = 0;
+  if (str.empty()) {
+    *pok = false;
+    return 0; 
+  } 
+  int result = 0;
   for (int i = 0; i < str.length(); ++i) {
     char c = str[i];
-    switch (c) {
-      case '0': 
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        x = c - 48;
-        break;
-      default:
-        *pok = false;
-        return 0; 
+    if (c >= '0' && c <= '9') {
+      result = result * 10 + (c - '0');
+    } else {
+      *pok = false;
+      return 0;
     }
-    y = y * 10 + x;
   }
   *pok = true;
-  return y;
+  return result;
 }
 
 int main() {
+  bool ok = true;
+   
+  assert(str_to_num("123", &ok) == 123 && ok);
+  assert(str_to_num("err", &ok) == 0 && !ok);
+  assert(str_to_num("", &ok) == 0 && !ok);
+  
   string str = "";
+  vector<int> numbers;
   cout << "Enter two numbers and '|' in the end: \n";
   
   while (cin >> str) {
     if (str.length() == 1 && str[0] == '|') {
       break;
     }
-    bool ok = true;
     int num = str_to_num(str, &ok);
     if (ok) {
-      cout << "'" << num << "' is a number.\n";    
+      numbers.push_back(num);   
     } else {
-      cout << "'" << str << "' not a number, please enter a number.\n";
+      cout << "'" << str << "' not a number.\n";
     }
   }
-  /*if (numbers.size() <= 2) {
+  if (numbers.size() < 2) {
+    cout << "You entered too few numbers.\n";
+  } else if (numbers.size() == 2) {
     cout << "You have entered: ";
     for ( int х : numbers) {
       cout << х << ", " ;
@@ -61,6 +61,5 @@ int main() {
   } else {
     cout << " You entered too many numbers.\n";
   }
-   */
 }
 
