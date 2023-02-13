@@ -3,37 +3,60 @@
 #include <limits>
 
 double str_to_num(string str, bool* pok) {
-
-  if (str.empty()) {
-    *pok = false;
+  int len = str.length();
+  *pok = false;
+  if (len == 0) {
     return 0; 
   } 
+  
   double result = 0;
   int i = 0;
-  for (; i < str.length(); ++i) {
-    char c = str[i];
+  char c;
+  double exp = 1;
+  
+  for (; i < len; ++i) {
+    c = str[i];
     if (c >= '0' && c <= '9') {
       result = result * 10 + (c - '0');
+    } else if (c == 'c' && i > 0) { // check that there is at least one digit
+      goto unit;      
     } else if (c == '.') {
       break;
     } else {
-      *pok = false;
       return 0;
     }
   }
+  
   ++i; // skip '.'
-  double exp = 1;
-  for (; i < str.length(); ++i) {
-    char c = str[i];
+  for (; i < len; ++i) {
+    c = str[i];
     if (c >= '0' && c <= '9') {
       exp *= 10;
       result += (c - '0') / exp;
+    } else if (c == 'c' && i > 1) {  // check that there is at least one digit besides '.'
+      goto unit;
     } else {
-      *pok = false;
       return 0;
     }
   }
-  *pok = true;
+  
+unit:
+  ++i;
+  if (i < len) {
+    c = str[i];
+    if (c != 'm') {
+      return 0;
+    } 
+  } else {
+    return 0;
+  }
+  ++i;
+  if (i < len) {
+    return 0;
+  } else {
+    *pok = true;
+  }
+
   return result;
 }
 
@@ -48,15 +71,21 @@ void print_vector(const vector<double>* pv) {
 int main() {
   bool ok = true;
    
-  assert(str_to_num("123", &ok) == 123 && ok);
+  assert(str_to_num("123", &ok) == 0 && !ok);
+  assert(str_to_num("123cm", &ok) == 123 && ok);
   assert(str_to_num("err", &ok) == 0 && !ok);
   assert(str_to_num("", &ok) == 0 && !ok);
-  assert(str_to_num("12.34", &ok) == 12.34 && ok);
+  assert(str_to_num("12.34", &ok) == 0 && !ok);
+  assert(str_to_num("12.34cm", &ok) == 12.34 && ok);
   assert(str_to_num("12..34", &ok) == 0 && !ok);
+  assert(str_to_num("cm", &ok) == 0 && !ok);
+  assert(str_to_num(".cm", &ok) == 0 && !ok);
+  assert(str_to_num("12cmm", &ok) == 0 && !ok);
   // assert(str_to_num("1.9999999999999999999", &ok) == 1.9999999999999999999 && ok); // result of function equals 2 
+
   
   string str = "";
-  cout << "Enter doubles and '|' in the end: \n";
+  cout << "Enter doubles and units and '|' in the end: \n";
   double small = numeric_limits<double>::max();
   double large = numeric_limits<double>::min();
   
@@ -69,12 +98,11 @@ int main() {
       if (num < small) {
         cout << num << " the smallest so far. \n";
         small = num;
-      } else if (num > large) {
+      }
+      if (num > large) {
         cout << num << " the largest so far. \n";
         large = num;
-      } else {
-        cout << num << "\n";
-      }
+      } 
     } else {
       cout << "'" << str << "' not a number.\n";
     }
