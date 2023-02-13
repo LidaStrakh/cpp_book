@@ -1,7 +1,9 @@
 #include "std_lib_facilities.h"
 #include <assert.h>
+#include <limits>
 
 double str_to_num(string str, bool* pok) {
+
   if (str.empty()) {
     *pok = false;
     return 0; 
@@ -35,6 +37,14 @@ double str_to_num(string str, bool* pok) {
   return result;
 }
 
+void print_vector(const vector<double>* pv) {
+  cout << "Vector: ";
+  for (double x : *pv) {
+    cout << x << " ";
+  }
+  cout << "\n";
+}
+
 int main() {
   bool ok = true;
    
@@ -46,8 +56,9 @@ int main() {
   // assert(str_to_num("1.9999999999999999999", &ok) == 1.9999999999999999999 && ok); // result of function equals 2 
   
   string str = "";
-  vector<double> numbers;
-  cout << "Enter two numbers and '|' in the end: \n";
+  cout << "Enter doubles and '|' in the end: \n";
+  double small = numeric_limits<double>::max();
+  double large = numeric_limits<double>::min();
   
   while (cin >> str) {
     if (str.length() == 1 && str[0] == '|') {
@@ -55,33 +66,21 @@ int main() {
     }
     double num = str_to_num(str, &ok);
     if (ok) {
-      numbers.push_back(num);   
+      if (num < small) {
+        cout << num << " the smallest so far. \n";
+        small = num;
+      } else if (num > large) {
+        cout << num << " the largest so far. \n";
+        large = num;
+      } else {
+        cout << num << "\n";
+      }
     } else {
       cout << "'" << str << "' not a number.\n";
     }
   }
-  if (numbers.size() < 2) {
-    cout << "You entered too few numbers.\n";
-  } else if (numbers.size() == 2) {
-    cout << "You have entered: ";
-    for ( double х : numbers) {
-      cout << х << ", " ;
-    }
-    cout << "\n"; 
-    sort(numbers);
-    double first = numbers[0];
-    double last = numbers[numbers.size() - 1];
-    cout << "The smaller value is: " << first << "\n";
-    cout << "The larger value is: " << last << "\n";
-    if (first == last) {
-      cout << "The numbers " << first << " and " << last << " are equal.\n";
-    } else if (last -  first <= 1) {
-      cout << "The numbers " << first << " and " << last << " are almost equal (differ by less than 1.0).\n";
-    } else if (last -  first <= 100) {
-      cout << "The numbers " << first << " and " << last << " are almost equal (differ by less than 100).\n";
-    }
-  } else {
-    cout << " You entered too many numbers.\n";
-  }
+  
+  cout << "The smallest value is: " << small << "\n";
+  cout << "The largest value is: " << large << "\n"; 
 }
 
