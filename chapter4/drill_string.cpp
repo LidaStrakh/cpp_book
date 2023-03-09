@@ -2,8 +2,32 @@
 #include <assert.h>
 #include <limits>
 
+enum class Unit {
+  METER,
+  CENTIMETER,
+  FOOT,
+  INCH,
+  ERROR
+};
+
+Unit str_to_unit(string str, int i = 0) {
+  int len = str.length();
+
+  if (i + 1 == len && str[i] == 'm') {
+    return Unit::METER;
+  } else if (i + 2 == len && str[i] == 'c' && str[i + 1] == 'm') {
+    return Unit::CENTIMETER;
+  } else if (i + 2 == len && str[i] == 'f' && str[i + 1] == 't') {
+    return Unit::FOOT;
+  } else if (i + 2 == len && str[i] == 'i' && str[i + 1] == 'n') {
+    return Unit::INCH;
+  } else {
+    return Unit::ERROR;
+  }
+}
+
 // TODO: rewrite without labels
-double str_to_num(string str, bool* pok, bool* have_units) {
+double str_to_num(string str, bool* pok, bool* have_units, Unit* unit) {
   const int len = str.length();
   *pok = false;
   *have_units = false;
@@ -52,20 +76,7 @@ frac:
   
 unit:
   *have_units = true;
-  if (i + 2 == len && str[i] == 'c' && str[i + 1] == 'm') {
-    result *= CM_TO_M;
-    goto ok;
-  } else if (i + 2 == len && str[i] == 'f' && str[i + 1] == 't') {
-    result *= FT_TO_M;
-    goto ok;
-  } else if (i + 2 == len && str[i] == 'i' && str[i + 1] == 'n') {
-    result *= IN_TO_M;
-    goto ok;
-  } else if (i + 1 == len && str[i] == 'm') {
-    goto ok;
-  } else {
-    return 0;
-  }
+  *unit = str_to_unit(str, i);
 
 ok:
   *pok = true;
@@ -80,48 +91,24 @@ void print_vector(const vector<double>* pv) {
   cout << "\n";
 }
 
-enum class Unit {
-  METER,
-  CENTIMETER,
-  FOOT,
-  INCH,
-  ERROR
-};
-
-Unit str_to_unit (string str) {
-  int len = str.length();
-  int i = 0;
-
-  if (i + 1 == len && str[i] == 'm') {
-    return Unit::METER;
-  } else if (i + 2 == len && str[i] == 'c' && str[i + 1] == 'm') {
-    return Unit::CENTIMETER;
-  } else if (i + 2 == len && str[i] == 'f' && str[i + 1] == 't') {
-    return Unit::FOOT;
-  } else if (i + 2 == len && str[i] == 'i' && str[i + 1] == 'n') {
-    return Unit::INCH;
-  } else {
-    return Unit::ERROR;
-  }
-}
-
 int main() {
   bool ok = true;
   bool have_units = false;
+  Unit unit;
    
-  assert(str_to_num("123", &ok, &have_units) == 123 && ok && !have_units);
-  assert(str_to_num("123cm", &ok, &have_units) == 1.23 && ok && have_units);
-  assert(str_to_num("err", &ok, &have_units) == 0 && !ok);
-  assert(str_to_num("", &ok, &have_units) == 0 && !ok);
-  assert(str_to_num("12.34", &ok, &have_units) == 12.34 && ok && !have_units);
-  assert(str_to_num("12.34cm", &ok, &have_units) == 0.1234 && ok && have_units);
-  assert(str_to_num("12..34", &ok, &have_units) == 0 && !ok);
-  assert(str_to_num("cm", &ok, &have_units) == 0 && !ok);
-  assert(str_to_num(".cm", &ok, &have_units) == 0 && !ok);
-  assert(str_to_num("12cmm", &ok, &have_units) == 0 && !ok);
-  assert(str_to_num("12.34in", &ok, &have_units) == 0.313436 && ok && have_units);
-  assert(str_to_num("12.34ft", &ok, &have_units) == 3.761232 && ok && have_units);
-  assert(str_to_num("12.34m", &ok, &have_units) == 12.34 && ok && have_units);
+  assert(str_to_num("123", &ok, &have_units, &unit) == 123 && ok && !have_units);
+  assert(str_to_num("123cm", &ok, &have_units, &unit) == 123 && ok && have_units && unit == Unit::CENTIMETER);
+  assert(str_to_num("err", &ok, &have_units, &unit) == 0 && !ok);
+  assert(str_to_num("", &ok, &have_units, &unit) == 0 && !ok);
+  assert(str_to_num("12.34", &ok, &have_units, &unit) == 12.34 && ok && !have_units);
+  assert(str_to_num("12.34cm", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::CENTIMETER);
+  assert(str_to_num("12..34", &ok, &have_units, &unit) == 0 && !ok);
+  assert(str_to_num("cm", &ok, &have_units, &unit) == 0 && !ok);
+  assert(str_to_num(".cm", &ok, &have_units, &unit) == 0 && !ok);
+  assert(str_to_num("12cmm", &ok, &have_units, &unit) == 12 && ok && have_units && unit == Unit::ERROR);
+  assert(str_to_num("12.34in", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::INCH);
+  assert(str_to_num("12.34ft", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::FOOT);
+  assert(str_to_num("12.34m", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::METER);
   // assert(str_to_num("1.9999999999999999999", &ok) == 1.9999999999999999999 && ok);
   // result of function equals 2
 
@@ -138,13 +125,14 @@ int main() {
       break;
     }
     bool error = false;
-    num = str_to_num(str, &ok, &have_units);
-    if (ok && have_units) {
-      cout << "Converted: " << str << " = " << num << "m.\n";
-    } else if (ok && !have_units) {
-      string s;
-      cin >> s;
-      switch (str_to_unit(s)) {
+    num = str_to_num(str, &ok, &have_units, &unit);
+    if (ok) {
+      if (!have_units) {
+        string s;
+        cin >> s;
+        unit = str_to_unit(s);
+      }
+      switch (unit) {
         case Unit::METER:
           cout << "Converted: " << str << " m = " << num << "m.\n";
           break;
@@ -162,7 +150,7 @@ int main() {
           break;
         case Unit::ERROR:
           error = true;
-          cout << "'" << s << "' wrong unit.\n";
+          cout << "wrong unit.\n";
           break;
       }
     } else {
