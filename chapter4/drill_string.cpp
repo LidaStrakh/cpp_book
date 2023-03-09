@@ -37,12 +37,12 @@ double str_to_num(string str, bool* pok, bool* have_units) {
 
 frac:
   ++i; // skip '.'
-  for (; i < len; ++i) {
+  for (int j = i; i < len; ++i) {
     c = str[i];
     if (c >= '0' && c <= '9') {
       exp *= 10;
       result += (c - '0') / exp;
-    } else if (i > 2) { // check that the fractional part contains at least one digit
+    } else if (i > j) { // check that the fractional part contains at least one digit
       goto unit;
     } else {
       return 0;
