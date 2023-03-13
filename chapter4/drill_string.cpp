@@ -7,7 +7,8 @@ enum class Unit {
   CENTIMETER,
   FOOT,
   INCH,
-  ERROR
+  ERROR,
+  NONE
 };
 
 Unit str_to_unit(string str, int i = 0) {
@@ -27,10 +28,10 @@ Unit str_to_unit(string str, int i = 0) {
 }
 
 // TODO: rewrite without labels
-double str_to_num(string str, bool* pok, bool* have_units, Unit* unit) {
+double str_to_num(string str, bool* pok, Unit* unit) {
   const int len = str.length();
   *pok = false;
-  *have_units = false;
+  *unit = Unit::NONE;
   
   if (len == 0) {
     return 0; 
@@ -75,7 +76,6 @@ frac:
   goto ok;
   
 unit:
-  *have_units = true;
   *unit = str_to_unit(str, i);
 
 ok:
@@ -93,22 +93,21 @@ void print_vector(const vector<double>* pv) {
 
 int main() {
   bool ok = true;
-  bool have_units = false;
   Unit unit;
    
-  assert(str_to_num("123", &ok, &have_units, &unit) == 123 && ok && !have_units);
-  assert(str_to_num("123cm", &ok, &have_units, &unit) == 123 && ok && have_units && unit == Unit::CENTIMETER);
-  assert(str_to_num("err", &ok, &have_units, &unit) == 0 && !ok);
-  assert(str_to_num("", &ok, &have_units, &unit) == 0 && !ok);
-  assert(str_to_num("12.34", &ok, &have_units, &unit) == 12.34 && ok && !have_units);
-  assert(str_to_num("12.34cm", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::CENTIMETER);
-  assert(str_to_num("12..34", &ok, &have_units, &unit) == 0 && !ok);
-  assert(str_to_num("cm", &ok, &have_units, &unit) == 0 && !ok);
-  assert(str_to_num(".cm", &ok, &have_units, &unit) == 0 && !ok);
-  assert(str_to_num("12cmm", &ok, &have_units, &unit) == 12 && ok && have_units && unit == Unit::ERROR);
-  assert(str_to_num("12.34in", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::INCH);
-  assert(str_to_num("12.34ft", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::FOOT);
-  assert(str_to_num("12.34m", &ok, &have_units, &unit) == 12.34 && ok && have_units && unit == Unit::METER);
+  assert(str_to_num("123", &ok, &unit) == 123 && ok && unit == Unit::NONE);
+  assert(str_to_num("123cm", &ok, &unit) == 123 && ok && unit == Unit::CENTIMETER);
+  assert(str_to_num("err", &ok, &unit) == 0 && !ok);
+  assert(str_to_num("", &ok, &unit) == 0 && !ok);
+  assert(str_to_num("12.34", &ok, &unit) == 12.34 && ok && unit == Unit::NONE);
+  assert(str_to_num("12.34cm", &ok, &unit) == 12.34 && ok && unit == Unit::CENTIMETER);
+  assert(str_to_num("12..34", &ok, &unit) == 0 && !ok);
+  assert(str_to_num("cm", &ok, &unit) == 0 && !ok);
+  assert(str_to_num(".cm", &ok, &unit) == 0 && !ok);
+  assert(str_to_num("12cmm", &ok, &unit) == 12 && ok && unit == Unit::ERROR);
+  assert(str_to_num("12.34in", &ok, &unit) == 12.34 && ok && unit == Unit::INCH);
+  assert(str_to_num("12.34ft", &ok, &unit) == 12.34 && ok && unit == Unit::FOOT);
+  assert(str_to_num("12.34m", &ok, &unit) == 12.34 && ok && unit == Unit::METER);
   // assert(str_to_num("1.9999999999999999999", &ok) == 1.9999999999999999999 && ok);
   // result of function equals 2
 
@@ -125,10 +124,10 @@ int main() {
       break;
     }
     bool error = false;
-    num = str_to_num(str, &ok, &have_units, &unit);
+    num = str_to_num(str, &ok, &unit);
     int num_orig = num;
     if (ok) {
-      if (!have_units) {
+      if (unit == Unit::NONE) {
         string s;
         cin >> s;
         unit = str_to_unit(s);
@@ -152,6 +151,9 @@ int main() {
         case Unit::ERROR:
           error = true;
           cout << "wrong unit.\n";
+          break;
+        case Unit::NONE:
+          abort();
           break;
       }
     } else {
