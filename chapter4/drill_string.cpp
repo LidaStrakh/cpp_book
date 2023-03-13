@@ -31,7 +31,6 @@ Unit str_to_unit(string str, int i = 0) {
   }
 }
 
-// TODO: rewrite without labels
 double str_to_num(string str, bool* pok, Unit* unit) {
   const int len = str.length();
   *pok = false;
@@ -45,40 +44,44 @@ double str_to_num(string str, bool* pok, Unit* unit) {
   int i = 0;
   char c;
   double exp = 1;
+  bool have_unit = false;
+  bool have_dot = false;
 
   for (; i < len; ++i) {
     c = str[i];
     if (c >= '0' && c <= '9') {
       result = result * 10 + (c - '0');
     } else if (c == '.') {
-      goto frac;
+      have_dot = true;
+      break;
     } else if (i > 0) { // check that the number contains at least one digit
-      goto unit;
+      have_unit = true;
+      break;
     } else {
       return 0;
     }
   }
-  goto ok;
 
-frac:
-  ++i; // skip '.'
-  for (int j = i; i < len; ++i) {
-    c = str[i];
-    if (c >= '0' && c <= '9') {
-      exp *= 10;
-      result += (c - '0') / exp;
-    } else if (i > j) { // check that the fractional part contains at least one digit
-      goto unit;
-    } else {
-      return 0;
+  if (have_dot) {
+    ++i; // skip '.'
+    for (int j = i; i < len; ++i) {
+      c = str[i];
+      if (c >= '0' && c <= '9') {
+        exp *= 10;
+        result += (c - '0') / exp;
+      } else if (i > j) { // check that the fractional part contains at least one digit
+        have_unit = true;
+        break;
+      } else {
+        return 0;
+      }
     }
   }
-  goto ok;
-  
-unit:
-  *unit = str_to_unit(str, i);
 
-ok:
+  if (have_unit) {
+    *unit = str_to_unit(str, i);
+  }
+
   *pok = true;
   return result;
 }
