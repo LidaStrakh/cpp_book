@@ -11,6 +11,10 @@ enum class Unit {
   NONE
 };
 
+constexpr double CM_TO_M = 0.01; // convert centimeters to meters
+constexpr double FT_TO_M = 0.3048; // convert feet to meters
+constexpr double IN_TO_M = 0.0254; // convert inches to meters
+
 Unit str_to_unit(string str, int i = 0) {
   int len = str.length();
 
@@ -32,7 +36,7 @@ double str_to_num(string str, bool* pok, Unit* unit) {
   const int len = str.length();
   *pok = false;
   *unit = Unit::NONE;
-  
+
   if (len == 0) {
     return 0; 
   } 
@@ -41,10 +45,6 @@ double str_to_num(string str, bool* pok, Unit* unit) {
   int i = 0;
   char c;
   double exp = 1;
-  
-  constexpr double CM_TO_M = 0.01; // convert centimeters to meters
-  constexpr double FT_TO_M = 0.3048; // convert feet to meters
-  constexpr double IN_TO_M = 0.0254; // convert inches to meters
 
   for (; i < len; ++i) {
     c = str[i];
@@ -94,7 +94,7 @@ void print_vector(const vector<double>* pv) {
 int main() {
   bool ok = true;
   Unit unit;
-   
+
   assert(str_to_num("123", &ok, &unit) == 123 && ok && unit == Unit::NONE);
   assert(str_to_num("123cm", &ok, &unit) == 123 && ok && unit == Unit::CENTIMETER);
   assert(str_to_num("err", &ok, &unit) == 0 && !ok);
@@ -137,15 +137,15 @@ int main() {
           cout << "Converted: " << num_orig << " m = " << num << "m.\n";
           break;
         case Unit::CENTIMETER:
-          num *= 0.01;
+          num *= CM_TO_M;
           cout << "Converted: " << num_orig << " cm = " << num << "m.\n";
           break;
         case Unit::FOOT:
-          num *= 0.3048;
+          num *= FT_TO_M;
           cout << "Converted: " << num_orig << " ft = " << num << "m.\n";
           break;
         case Unit::INCH:
-          num *= 0.0254;
+          num *= IN_TO_M;
           cout << "Converted: " << num_orig << " in = " << num << "m.\n";
           break;
         case Unit::ERROR:
