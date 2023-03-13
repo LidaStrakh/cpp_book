@@ -126,6 +126,7 @@ int main() {
     }
     bool error = false;
     num = str_to_num(str, &ok, &have_units, &unit);
+    int num_orig = num;
     if (ok) {
       if (!have_units) {
         string s;
@@ -134,19 +135,19 @@ int main() {
       }
       switch (unit) {
         case Unit::METER:
-          cout << "Converted: " << str << " m = " << num << "m.\n";
+          cout << "Converted: " << num_orig << " m = " << num << "m.\n";
           break;
         case Unit::CENTIMETER:
           num *= 0.01;
-          cout << "Converted: " << str << " cm = " << num << "m.\n";
+          cout << "Converted: " << num_orig << " cm = " << num << "m.\n";
           break;
         case Unit::FOOT:
           num *= 0.3048;
-          cout << "Converted: " << str << " ft = " << num << "m.\n";
+          cout << "Converted: " << num_orig << " ft = " << num << "m.\n";
           break;
         case Unit::INCH:
           num *= 0.0254;
-          cout << "Converted: " << str << " in = " << num << "m.\n";
+          cout << "Converted: " << num_orig << " in = " << num << "m.\n";
           break;
         case Unit::ERROR:
           error = true;
