@@ -116,11 +116,9 @@ int main() {
 
   string str = "";
   cout << "Enter doubles and units and '|' in the end: \n";
-  double small = numeric_limits<double>::max();
-  double large = numeric_limits<double>::min();
   double num = 0;
   double sum = 0;
-  int i_entered = 0;
+  vector<double> numbers;
 
   while (cin >> str) {
     if (str.length() == 1 && str[0] == '|') {
@@ -164,22 +162,20 @@ int main() {
       cout << "'" << str << "' error.\n";
     }
     if (!error) {
+      numbers.push_back(num);
       sum += num;
-      ++i_entered;
-      if (num < small) {
-        cout << num << " the smallest so far. \n";
-        small = num;
-      }
-      if (num > large) {
-        cout << num << " the largest so far. \n";
-        large = num;
-      } 
     }
   }
 
-  cout << "The smallest value is: " << small << " m" << "\n";
-  cout << "The largest value is: " << large << " m" << "\n";
-  cout << "The number of values: " << i_entered << "\n";
-  cout << "Sum: "<< sum << " m\n";
+  if (numbers.empty()) {
+    cout << "Vector is empty.\n";
+  } else {
+    sort(numbers.begin(), numbers.end());
+    print_vector(&numbers);
+    cout << "The number of values: " << numbers.size() << "\n";
+    cout << "The smallest value is: " << numbers.front() << " m" << "\n";
+    cout << "The largest value is: " << numbers.back() << " m" << "\n";
+    cout << "Sum: "<< sum << " m\n";
+  }
 }
 
