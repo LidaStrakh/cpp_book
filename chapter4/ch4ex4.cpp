@@ -4,21 +4,30 @@
 
 bool VERBOSE = false;
 
+void ask(int mid) {
+  cout << "Is the number you are thinking of less than " << mid <<"?(yes/no)\n";
+}
+
 void step(int* start, int* end, int x, bool interactive) {
   assert(*start < *end);
   string str;
   int mid = (*start + *end + 1) / 2;
 
-  if (VERBOSE || interactive) {
-    cout << "Is the number you are thinking of less than " << mid <<"?(yes/no)\n";
-  }
   if (interactive) {
+    ask(mid);
     cin >> str;
   } else {
+#ifdef DEBUG
+    if (VERBOSE) {
+      ask(mid);
+    }
+#endif
     str = x < mid ? "yes" : "no";
+#ifdef DEBUG
     if (VERBOSE) {
       cout << str << "\n";
     }
+#endif
   }
 
   if (str == "yes") {
@@ -36,9 +45,11 @@ int guess(int x, bool interactive = false) {
   int end = 100;
   while (start < end) {
     step(&start, &end, x, interactive);
+#ifdef DEBUG
     if (VERBOSE) {
       cout << "start - " << start << "; end - " << end << ".\n";
     }
+#endif
   }
   return start;
 }
@@ -54,9 +65,11 @@ int main(int argc, char** argv) {
   }
 
   for (int y = 1; y <= 100; ++y) {
+#ifdef DEBUG
     if (VERBOSE) {
       cout << "!!!" << y  << "\n";
     }
+#endif
     assert(y == guess(y));
   }
 
