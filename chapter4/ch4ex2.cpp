@@ -2,9 +2,11 @@
 #include <cmath>
 #include <cassert>
 
-double median(const vector<double>* pnumbers) {
+double median(vector<double>* pnumbers) {
   double med1;
   size_t len = pnumbers->size();
+
+  sort(pnumbers->begin(), pnumbers->end());
 
   if (len == 0) {
     cout << "No numbers - no median!!!\n";
@@ -23,9 +25,11 @@ void test() {
   vector<double> test1;
   vector<double> test2 = {1, 2, 3};
   vector<double> test3 = {1, 2, 3, 4};
+  vector<double> test4 = {4, 1, 7};
   assert(isnan(median(&test1)) != 0);
   assert(median(&test2) == 2);
   assert(median(&test3) == 2.5);
+  assert(median(&test4) == 4);
 }
 
 int main() {
@@ -39,7 +43,6 @@ int main() {
   while (cin >> num) {
     numbers.push_back(num);
   }
-  sort(numbers.begin(), numbers.end());
   med = median(&numbers);
   cout << "Median is: " << med << ".\n";
 }
