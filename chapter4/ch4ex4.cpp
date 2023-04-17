@@ -3,7 +3,7 @@
 #include <cstring>
 
 #ifdef DEBUG
-#define DEBUG_PRINT(x) if (VERBOSE) { x; }
+#define DEBUG_PRINT(x) do { if (VERBOSE) { x; } } while(false)
 #else 
 #define DEBUG_PRINT(x)
 #endif
@@ -24,9 +24,9 @@ void step(int* start, int* end, int x, bool interactive) {
     ask(mid);
     cin >> str;
   } else {
-    DEBUG_PRINT(ask(mid))
+    DEBUG_PRINT(ask(mid));
     str = x < mid ? "yes" : "no";
-    DEBUG_PRINT(cout << str << "\n")
+    DEBUG_PRINT(cout << str << "\n");
   }
 
   if (str == "yes") {
@@ -44,7 +44,7 @@ int guess(int x, bool interactive = false) {
   int end = 100;
   while (start < end) {
     step(&start, &end, x, interactive);
-    DEBUG_PRINT(cout << "start - " << start << "; end - " << end << ".\n")
+    DEBUG_PRINT(cout << "start - " << start << "; end - " << end << ".\n");
   }
   return start;
 }
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
   }
 
   for (int y = 1; y <= 100; ++y) {
-    DEBUG_PRINT(cout << "!!!" << y  << "\n")
+    DEBUG_PRINT(cout << "!!!" << y  << "\n");
     assert(y == guess(y));
   }
 
